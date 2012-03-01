@@ -138,6 +138,10 @@ int main(int argc, char *argv[], char *envp[]) {
 		case 'p':
 			penalty = argDouble(argc, argv, &argi);
 			break;
+
+		default:
+			fprintf(stderr, "%s: invalid option ‘%s’\n", self, argv[argi]);
+			return EXIT_FAILURE;
 		}
 	}
 
