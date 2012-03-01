@@ -1,0 +1,63 @@
+.Dd March 1, 2012
+.Dt SPAWN 1
+.Os
+.Sh NAME
+.Nm spawn
+.Nd invoke multiple programme instances and respawn
+.Sh SYNOPSIS
+.Nm galette
+.Op Fl 1e
+.Op Fl i Ar interval
+.Op Fl n Ar number
+.Op Fl p Ar penalty
+.Oo
+.Op Ar command
+.Bk
+.Op Ar argument ...
+.Ek
+.Oc
+.Sh DESCRIPTION
+The
+.Nm
+shall invoke as many instances of
+.Ar command
+as given by
+.Ar number
+and respawn them unless disabled by the
+.Fl 1
+flag.
+Before each respawn, it shall sleep
+.Ar interval
+seconds, adding another
+.Ar penalty
+seconds if an instance returned a non-zero exit status.
+If the
+.Fl e
+flag was specified, an instance returning a non-zero exit status shall not be respawned.
+.Sh OPTIONS
+.Bl -tag -width 12n -compact -offset indent
+.It Fl 1
+Disable respawning.
+.It Fl e
+Stop respawning if an instance returned a non-zero exit status.
+.It Fl i Ar interval
+Sleep
+.Ar interval
+seconds
+.Pq 0.2 by default
+before respawning an instance.
+.It Fl n Ar number
+Spawn
+.Ar number
+instances
+.Pq 4 by default
+in parallel.
+.It Fl p Ar penalty
+Sleep an additional
+.Ar penalty
+seconds
+.Pq 1.0 by default
+before respawning an instance returning non-zero.
+.El
+.Sh AUTHORS
+.An "Mikael Voss" Aq mikael+spawn@illdefined.org
