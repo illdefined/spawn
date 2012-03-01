@@ -12,16 +12,51 @@
 
 #include <ev.h>
 
+/**
+ * \brief Programme invocation name
+ */
 static char const *self;
 
 static char **childArgv;
 static char **childEnvp;
 
+/**
+ * \brief Respawn on error
+ *
+ * If \c true respawn a process if it returns a non-zero status on exit.
+ */
 static bool respawn = true;
+
+/**
+ * \brief Respawn interval
+ *
+ * Time interval between process respawns.
+ */
 static double interval = 0.2;
+
+/**
+ * \brief Number of processes
+ *
+ * Number of processes to run in parallel.
+ */
 static unsigned long number = 4;
+
+/**
+ * \brief Respawn penalty
+ *
+ * Time penalty to add to the respawn interval if a process returns a non-zero status.
+ */
 static double penalty = 1.0;
 
+/**
+ * \brief Parse a floating-point option argument
+ *
+ * \param argc Argument count
+ * \param argv Argument vector
+ * \param argi Argument iterator
+ *
+ * \return Floating-point value
+ */
 static double argDouble(int argc, char *argv[const restrict], int *restrict argi) {
 	if (unlikely(*argi + 1 >= argc)) {
 		fprintf(stderr, "%s: option ‘%s’ requires a floating-point argument\n",
@@ -51,6 +86,15 @@ static double argDouble(int argc, char *argv[const restrict], int *restrict argi
 	return val;
 }
 
+/**
+ * \brief Parse an integer option argument
+ *
+ * \param argc Argument count
+ * \param argv Argument vector
+ * \param argi Argument iterator
+ *
+ * \return Integer value
+ */
 static unsigned long argInteger(int argc, char *argv[const restrict], int *restrict argi) {
 	if (unlikely(*argi + 1 >= argc)) {
 		fprintf(stderr, "%s: option ‘%s’ requires an integer argument\n", self, argv[*argi]);
@@ -74,6 +118,15 @@ static unsigned long argInteger(int argc, char *argv[const restrict], int *restr
 	return val;
 }
 
+/**
+ * \brief Timer event callback
+ *
+ * \param loop    Event loop
+ * \param watcher Event watcher
+ * \param events  Event bit mask
+ *
+ * Triggered every time a respawn interval timer expires.
+ */
 static void timerEvent(struct ev_loop *restrict loop, struct ev_timer *watcher, int events) {
 	ev_timer_stop(loop, watcher);
 
@@ -90,6 +143,15 @@ static void timerEvent(struct ev_loop *restrict loop, struct ev_timer *watcher, 
 	ev_child_start(loop, childWatcher);
 }
 
+/**
+ * \brief Child event callback
+ *
+ * \param loop    Event loop
+ * \param watcher Event watcher
+ * \param events  Event bit mask
+ *
+ * Triggered every time a child process terminates.
+ */
 static void childEvent(struct ev_loop *restrict loop, struct ev_child *watcher, int events) {
 	ev_child_stop(loop, watcher);
 
