@@ -42,6 +42,11 @@ static double argDouble(int argc, char *argv[const restrict], int *restrict argi
 			self, endp, argv[*argi - 1]);
 		exit(EXIT_FAILURE);
 	}
+	else if (unlikely(val < 0.0)) {
+		fprintf(stderr, "%s: floating-point argument ‘%s’ to option ‘%s’ must be positive\n",
+			self, argv[*argi], argv[*argi - 1]);
+		exit(EXIT_FAILURE);
+	}
 
 	return val;
 }
