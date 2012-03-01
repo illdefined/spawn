@@ -16,7 +16,7 @@ spawn: spawn.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $>
 
 bin    := $(DESTDIR)$(PREFIX)/bin/
-man    := $(DESTDIR)$(PREFIX)/share/man1/
+man    := $(DESTDIR)$(PREFIX)/share/man/man1/
 
 install: $(bin)spawn $(man)spawn.1
 
