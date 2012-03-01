@@ -21,6 +21,13 @@ static char **childArgv;
 static char **childEnvp;
 
 /**
+ * \brief Respawn processes
+ *
+ * If \c true respawn processes after their termination.
+ */
+static bool respawn = true;
+
+/**
  * \brief Respawn on error
  *
  * If \c true respawn a process if it returns a non-zero status on exit.
@@ -185,6 +192,10 @@ int main(int argc, char *argv[], char *envp[]) {
 		case '-':
 			break;
 
+		case '1':
+			respawn = false;
+			break;
+
 		case 'e':
 			resurrect = false;
 			break;
@@ -208,7 +219,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	}
 
 	if (unlikely(argi >= argc)) {
-		fprintf(stderr, "usage: %s [-e] [-i interval] [-n number] [-p penalty] [command]\n", self);
+		fprintf(stderr, "usage: %s [-1e] [-i interval] [-n number] [-p penalty] [command]\n", self);
 		return EXIT_FAILURE;
 	}
 
@@ -232,13 +243,15 @@ int main(int argc, char *argv[], char *envp[]) {
 			return EXIT_FAILURE;
 		}
 
-		ev_child_init(childWatcher + iter, childEvent, pid, 0);
-		childWatcher[iter].data = timerWatcher + iter;
+		if (respawn) {
+			ev_child_init(childWatcher + iter, childEvent, pid, 0);
+			childWatcher[iter].data = timerWatcher + iter;
 
-		ev_timer_init(timerWatcher + iter, timerEvent, 0.0, 0.0);
-		timerWatcher[iter].data = childWatcher + iter;
+			ev_timer_init(timerWatcher + iter, timerEvent, 0.0, 0.0);
+			timerWatcher[iter].data = childWatcher + iter;
 
-		ev_child_start(loop, childWatcher + iter);
+			ev_child_start(loop, childWatcher + iter);
+		}
 	}
 
 	ev_run(loop, 0);
