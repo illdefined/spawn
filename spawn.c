@@ -25,7 +25,7 @@ static char **childEnvp;
  *
  * If \c true respawn a process if it returns a non-zero status on exit.
  */
-static bool respawn = true;
+static bool resurrect = true;
 
 /**
  * \brief Respawn interval
@@ -161,7 +161,7 @@ static void childEvent(struct ev_loop *restrict loop, struct ev_child *watcher, 
 	if ((WIFEXITED(watcher->rstatus) &&
 		WEXITSTATUS(watcher->rstatus)) ||
 		WIFSIGNALED(watcher->rstatus)) {
-		if (!respawn)
+		if (!resurrect)
 			return;
 
 		ival += penalty;
@@ -186,7 +186,7 @@ int main(int argc, char *argv[], char *envp[]) {
 			break;
 
 		case 'e':
-			respawn = false;
+			resurrect = false;
 			break;
 
 		case 'i':
