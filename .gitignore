@@ -1,0 +1,6 @@
+# Spawn binary
+spawn
+
+# Hidden files
+.*
+!.gitignore
